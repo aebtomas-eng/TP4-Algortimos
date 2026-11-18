@@ -85,7 +85,40 @@ int indiceDe(const GrafoCiudades& g, const string& ciudad) {
 
 vector<vector<string>> componentesConexas(const GrafoCiudades& g) {
     // TODO: implementar
-    return {};
+    vector<string> vertices = g.get_vertices();
+    int cant_nodos = vertices.size();
+    vector<bool> visitados(cant_nodos,false);
+    vector<vector<string>> comp_conexas;
+
+    for (size_t i = 0; i < cant_nodos; i++)
+    {
+    if (!visitados[i])
+    {
+    vector<string> conexion;
+    // bfs
+    queue<int> cola;   
+    cola.push(i);
+    visitados[i]=true;
+    while (!cola.empty())
+    {
+        int elemento = cola.front();
+        cola.pop();
+        conexion.push_back(vertices[elemento]);
+        vector<string> vecinos = g.get_neighbors(vertices[elemento]);
+        for (size_t j = 0; j < vecinos.size(); j++)
+        {  
+            int indice = indiceDe(g, vecinos[j]);
+            if (!visitados[indice])
+            {
+                visitados[indice] = true;
+                cola.push(indice);
+            }
+        }
+    }
+    comp_conexas.push_back(conexion);
+    }   
+    }
+    return comp_conexas;
 }
 
 // ================================================================
@@ -99,7 +132,42 @@ const int INFINITO = 1000000000;
 // camino).
 vector<vector<int>> distanciasTodosConTodos(const GrafoCiudades& g) {
     // TODO: implementar
-    return {};
+    vector<vector<int>> distancias_todos;
+    vector<string> vertices = g.get_vertices();
+    int n = g.get_vertices().size();
+for (int i = 0; i < n; i++)
+{    
+    vector<int> distancia(n,INFINITO);
+    vector<bool> procesados(n,false);
+    priority_queue<array<int,2>> cola; //AYUDA NO SABEMOS INICIALIZAR UNA COLA DE PRIOIDAD DE ARRAYS
+    distancia[i] = 0;
+    cola.push({0, i});
+    while (!cola.empty())
+    {
+        int d = cola.top()[0];
+        int indice = cola.top()[1];
+        cola.pop();
+        if (!procesados[indice])
+        {
+            procesados[indice]=true;
+            vector<string> vecinos = g.get_neighbors(vertices[indice]);
+            for (size_t j = 0; j < vecinos.size(); j++)
+            {
+                int p = g.get_edge_data(vertices[indice], vecinos[j]).value();
+                int y = indiceDe(g, vecinos[j]);
+                if (d + p < distancia[y])
+                {
+                    distancia[y] = d + p;
+                    cola.push({distancia[y],y});
+                }
+            }
+        } 
+    }
+    distancias_todos.push_back(distancia);
+}
+    
+
+    return distancias_todos;
 }
 
 // ================================================================
