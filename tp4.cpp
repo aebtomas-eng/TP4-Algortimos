@@ -139,6 +139,9 @@ for (int i = 0; i < n; i++)
 {    
     vector<int> distancia(n,INFINITO);
     vector<bool> procesados(n,false);
+    pair<int, int> a; //asi se hace un par
+    a.first; // asi se accede
+    a.second;
     priority_queue<array<int,2>> cola; //AYUDA NO SABEMOS INICIALIZAR UNA COLA DE PRIOIDAD DE ARRAYS
     distancia[i] = 0;
     cola.push({0, i});
