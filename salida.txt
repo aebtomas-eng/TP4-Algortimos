@@ -1,0 +1,181 @@
+TP4 - Análisis de un grafo 
+Equipo: Pila de Nervios (LIFO)
+Integrantes: Tomas Emiliano Aebi, Lucia Victoria Rey
+
+
+Ciudades cargadas: 279
+
+=== Ejercicio 1 ===
+Resultado:
+  Componentes conexas: 4
+  Tamaño de la más grande: 272
+  Ciudades fuera de la más grande:
+    Río Grande
+    Tolhuin
+    Ushuaia
+    Puerto Argentino
+    Puerto Darwin
+    Bahía Zorro
+    Martín García
+
+Cómo lo pensamos:
+  Tenemos un vector de visitados. Recorremos todas las ciudades y, si 
+  una ya esta visitada, es porque pertenece a una componente que ya contamos.
+  Si no esta visitada, es una componente nueva: sumamos 1 al contador y lanzamos un BFS desde ahi.
+  Este marca como visitadas a todas las ciudades que se pueden alcanzar. Las ciudades que junto ese BFS son una componente.
+Orden:
+  O(n+m)
+
+
+=== Ejercicio 2 ===
+Parámetros: 
+  10000 walks de largo 100.
+  Cada walk empieza en una ciudad al azar y en cada paso elige un
+  vecino al azar con la misma probabilidad. Contamos cada ciudad en la
+  que cae, incluida la inicial. Si un walk llega a una ciudad sin
+  vecinos, se corta.
+
+Resultado:
+  Buenos Aires - La Quiaca: 1943 km
+  Buenos Aires - Ushuaia: 1000000000 km
+
+Algoritmo:
+  Dijkstra, lanzado una vez desde cada ciudad, con una cola de prioridad.
+  El resultado es una matriz de nxn donde dist[i][j] es la distancia minima en km ente i y j.
+  No usamos BFS porque BFS cuenta la cantidad de rutas, no sus kilometros.
+  Un camino de 2 rutas largas puede ser mas largo que uno de 4 rutas cortas, y BFS eligiria el de 2.
+  Originalmente pensamos en usar Kruskal, pero Kruskal arma un AGM y no da el camino mas corto entre dos ciudades en particular.
+  Tambien pensamos en llamarlo por cada par y guardar en un vector de vectores, pero no tenia muy buena complejidad.
+
+Elecciones de implementacion:
+  - La cola de prioridad de la STL saca primero al mas GRANDE, asi que
+    guardamos las distancias con signo negativo para invertir el orden.
+  - Si una ciudad no se puede alcanzar, su distancia queda en INFINITO
+
+Orden
+  Dijkstra con cola de prioridad cuesta O(m log n) por origen,
+  así que para las n ciudades queda O(n * m * log n).
+
+
+=== Ejercicio 3 ===
+Resultado:
+  Triángulos: 2281
+
+Como lo pensamos:
+  Hacemos un BFS desde cada ciudad que "se mueve 3 veces": la cola guarda pares (ciudades, cuantas aristas recorrio).
+  Mientras lleva menos de 3 aristas recorridas agrega a sus vecinos con un 1 arista recorrida.
+  Cuando llego a los 3 pasos no agrega nada, pero revisa si la ciudad en la que esta es la inicial.
+  Si es la inicial, hicimos inicial->B->C->Inicial, o sea un triangulo.
+  A diferencia de un BFS normal, NO usamos visitados, porue necesitamos poder volver a pasar por la ciudad inicial.
+
+  Al final dividimos por 6: Cada triangulo se cuenta 2 veces desde una misma ciudad (en sus dos sentidos) y se puede arrancar desde sus 3 ciudades o sea 2 x 3 =6.
+  Originalmente pensamos habia que dividir por 3, pero faltaba contar los dos sentidos.
+
+Orden:
+  O(n*d^3)
+
+=== Ejercicio 4 ===
+Resultado:
+  Diámetro: 4131 km, entre La Quiaca y Veintiocho de Noviembre
+
+Como lo pensamos:
+Usamos la matriz del ejercicio 2 y recorremos todos los pares (i,j) con J>i para no repetir, buscando la mayor distancia.
+Los pares sin camino los ignoramos: si no, el diametro siempre daria infinito apenas haya dos componentes. 
+Eso significa que el diametro que reportamos es el mayor entre ciudades que si estan conectadas
+
+O(n^2)
+
+=== Ejercicio 5 ===
+Parametros: 
+  10000 walks de largo 100 (cada walk cuenta hasta 101 ciudades: la
+  inicial más 100 pasos). Cada walk empieza en una ciudad al azar.
+  Contamos cada ciudad en la que cae, incluida la inicial. Si un walk
+  llega a una ciudad sin vecinos, se corta. Como hay azar, los números
+  cambian en cada corrida.
+
+Random walk comun: 
+  en cada paso elige un vecino con la misma
+  probabilidad para todos.
+
+Random walk por distancia: 
+  a cada vecino le damos un tramo de
+  tamaño 100/distancia (las rutas cortas dan tramos mas grandes),
+  randomizamos un numero entre 0 y la suma de los tramos, y nos movemos
+  al vecino cuyo tramo contiene ese numero. Asi la probabilidad es
+  inversamente proporcional a la distancia.
+
+Resultado:
+  10 más visitadas (random walk común):
+    Buenos Aires : 3867
+    La Plata : 3814
+    Quilmes : 3363
+    Tigre : 3348
+    Morón : 4104
+    Ezeiza : 4562
+    Mar del Plata : 3451
+    Bahía Blanca : 3987
+    Punta Alta : 3818
+    Tandil : 4238
+
+  10 más visitadas (random walk por distancia):
+    Buenos Aires : 6958
+    La Plata : 3878
+    Quilmes : 6230
+    Tigre : 5770
+    Morón : 7209
+    Ezeiza : 6521
+    Mar del Plata : 2998
+    Bahía Blanca : 3735
+    Punta Alta : 3199
+    Tandil : 2901
+
+  10 de mayor grado:
+    Buenos Aires : 10
+    La Plata : 10
+    Quilmes : 9
+    Tigre : 9
+    Morón : 11
+    Ezeiza : 12
+    Mar del Plata : 9
+    Bahía Blanca : 11
+    Punta Alta : 10
+    Tandil : 1
+  
+Que observamos (comun vs. grado):
+  La cantidad de visitas es casi proporcional al grado. Por
+  ejemplo, Ezeiza (grado 12) tiene 4562 visitas, Moron y Bahia Blanca
+  (grado 11) tienen 4104 y 3987,etc. Esto se ve confirmado leyendo ambos top 10.
+
+Por que creemos que pasa: 
+  Como trabajamos con un grado no dirigido a una ciudad se llega desde cualquiera de sus vecinos.
+  Cuantas mas rutas tiene, mas caminos llevan hasta ella. A largo plazo, la fraccion de
+  visitas de una ciudad es proporcional a su grado.
+
+Que cambia con la distancia:
+  La distancia si cambia. Las ciudades del Gran Buenos Aires suben mucho:
+  Buenos Aires pasa de 3867 a 6958 etc. Nosotros creemos que como las ciudades del Gran
+  Buenos Aires estan muy juntas entonces el walk tiende a quedarse dando vueltas ahi. 
+  Mar del Plata y Tandil tienen casi el mismo grado, pero sus rustas son largas,
+  asi que el walk las elige menos.
+
+=== Ejercicio 6 ===
+Idea: dadas dos ciudades, encontrar la ciudad que queda a mitad de camino entre ellas.
+
+Resultado:
+  Buenos Aires - Ushuaia:No hay camino entre las ciudades
+  Buenos Aires - La Quiaca:la posta entre Buenos Aires y La Quiaca es Quimilí, a 1064 km de Buenos Aires
+  Ushuaia - La Quiaca:No hay camino entre las ciudades
+
+Como lo pensamos: 
+  reutilizamos la matriz de distancias del ejercicio 2. Una ciudad m esta sobre un camino minio de inicial a final si:
+  dist[inicio][m]+dist[m][final]==dist[inicio][final](si hay que dar una vuelta, la suma da mas) 
+  De todas las ciudades que cumplen eso, nos quedamos con la que tiene dist[inicial][m] mas cerca de la mitad total.
+  Para no usar decimales comparamos abs(2*dist[inicio][m]-total).
+
+Casos base:
+  - Alguna ciudad no existe
+  - origen y destino son la misma ciudad
+  - No hay camino entre las dos
+  - Son vecinas directas: no hay ciudad intermedia
+
+Orden: O(n)

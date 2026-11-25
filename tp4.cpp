@@ -194,11 +194,34 @@ for (int i = 0; i < n; i++)
 
 int contarTriangulos(const GrafoCiudades& g) {
     // TODO: implementar
-    return 0;
+    vector<string> vertices = g.get_vertices();
+    size_t n = vertices.size();
+    int contador = 0;
+    for(size_t i=0; i<n;i++){
+        string inicial = vertices[i];
+        queue<pair<string,int>> cola;
+        cola.push({inicial,0}); //arranco en la ciudad inicial con 0 caminos recorridos
+        while(!cola.empty()){
+            string x = cola.front().first;
+            int caminos_recorridos = cola.front().second;
+            cola.pop();
+
+            if (caminos_recorridos==3){
+                if(x==inicial) contador++;
+            }
+            else{
+                vector<string> vecinos = g.get_neighbors(x);
+                for (size_t j=0; j< vecinos.size();j++){
+                    cola.push({vecinos[j], caminos_recorridos+1});
+                }
+            }
+        }
+    }
+    return contador/6;
 }
 
 // ================================================================
-//                EJERCICIO 4: DIÁMETRO CON PESOS
+//                EJERCICIO 4: DIÁMETRO CON PESOS,
 // ================================================================
 
 class Diametro {
@@ -330,12 +353,73 @@ Visitas randomWalksPorDistancia(const GrafoCiudades& g, int cantidad, int largo)
 // ================================================================
 //                   EJERCICIO 6: ANÁLISIS LIBRE
 // ================================================================
-
-void analisisLibre(const GrafoCiudades& g) {
-    // TODO: implementar
+void posta(const GrafoCiudades& g, const vector<vector<int>>& dist, const string& origen, const string& destino){
+    int inicio = indiceDe(g, origen);
+    int final = indiceDe(g, destino);
+    vector<string> vertices = g.get_vertices();
+    size_t n = vertices.size();
+    size_t mejor = n; // la mejor posta hasta el momento
+    int menor_diferencia =0; //que tan lejos esta de lamitad de esta es ciudad
+    if (inicio ==-1|| final==-1){
+        cout<< "Alguna de las ciudades no existe"<<endl;
+        return;
+    } 
+    if (inicio == final){ 
+        cout<< "El origen y el destino son la misma ciudad"<<endl;
+        return;
+    }
+    if(dist[inicio][final]==INFINITO){
+        cout<< "No hay camino entre las ciudades"<<endl;
+        return;
+    }
+    int total = dist[inicio][final];
+    for(size_t m=0; m<n;m++){
+        if (dist[inicio][m]==INFINITO || dist[m][final]==INFINITO) continue;
+        if (dist[inicio][m] == 0 || dist[m][final] == 0) continue;
+        if (dist[inicio][m]+dist[m][final]==total){ //descarto lo que no pertenezca al camino minimo
+            int diferencia = abs(2*dist[inicio][m]-total); //multiplico por 2 para no usar decimales
+            if (mejor ==n || diferencia < menor_diferencia){
+                mejor =m;
+                menor_diferencia = diferencia;
+            }
+        }
+    }
+    if (mejor ==n){
+         cout<< "No hay ninguna posta"<<endl;
+        return;
+        }
+    cout<< "la posta entre "<< origen << " y " << destino << " es " << vertices[mejor] << ", a " << dist[inicio][mejor]<< " km de " << origen <<endl;
     return;
 }
 
+void analisisLibre(const GrafoCiudades& g, const vector<vector<int>>& dist) {
+    // TODO: implementar
+    cout << "La posta: ciudad a mitad de camino entre dos ciudades" <<endl;
+    cout << "Buenos Aires - Ushuaia:";
+    posta(g, dist, "Buenos Aires", "Ushuaia"); 
+    cout << "Buenos Aires - La Quiaca:"; 
+    posta(g, dist, "Buenos Aires", "La Quiaca");
+    cout << "Ushuaia - La Quiaca:"; 
+    posta(g, dist, "Ushuaia", "La Quiaca");
+    return;
+}
+// ================================================================
+//                          FUNCION EXTRA
+// ================================================================
+void imprimirTop10(Visitas& v, const vector<string>& ciudades) {
+    vector<bool> visitada(ciudades.size(),false);
+    for (int i =0; i<10; i++){
+        size_t mejor = ciudades.size();
+        for (size_t j=0; j<ciudades.size();j++){
+            if (visitada[i]) continue;
+            if (mejor == ciudades.size() || v[ciudades[i]]>v[ciudades[mejor]]){
+                mejor = i;
+            }
+        }
+        visitada[mejor] =true;
+        cout<< ciudades[mejor] << " : " << v[ciudades[mejor]] << endl;
+    }
+}
 // ================================================================
 //                              MAIN
 // ================================================================
@@ -353,10 +437,26 @@ int main(int argc, char* argv[]) {
     vector<vector<string>> componentes = componentesConexas(g);
     cout << "Componentes conexas: " << componentes.size() << "\n";
     // TODO: tamaño de la más grande y ciudades que quedan fuera de ella
+    size_t mayor =0;
+    for (size_t i = 1; i < componentes.size(); i++) {
+        if (componentes[i].size() > componentes[mayor].size()) mayor = i;
+    }
+    cout << "Tamaño de la más grande: " << componentes[mayor].size() <<endl;
+    cout << "Ciudades fuera de la más grande:"<<endl;
+        for (size_t i = 0; i < componentes.size(); i++) {
+            if (i == mayor) continue;
+            for (size_t j = 0; j < componentes[i].size(); j++) {
+                cout << "  " << componentes[i][j] <<endl;
+            }
+        }
+
 
     cout << "\n=== Ejercicio 2 ===\n";
     vector<vector<int>> dist = distanciasTodosConTodos(g);
     // TODO: distancias Buenos Aires - La Quiaca y Buenos Aires - Ushuaia
+    cout << "Buenos Aires - La Quiaca: "<< dist[indiceDe(g, "Buenos Aires")][indiceDe(g, "La Quiaca")] << " km"<<endl;
+    cout << "Buenos Aires - Ushuaia: "<< dist[indiceDe(g, "Buenos Aires")][indiceDe(g, "Ushuaia")] << " km"<<endl;
+
 
     cout << "\n=== Ejercicio 3 ===\n";
     cout << "Triángulos: " << contarTriangulos(g) << "\n";
@@ -370,9 +470,27 @@ int main(int argc, char* argv[]) {
     Visitas visitas = randomWalks(g, 10000, 100);
     Visitas visitasPorDistancia = randomWalksPorDistancia(g, 10000, 100);
     // TODO: las 10 ciudades más visitadas en cada caso, y las 10 de mayor grado
+    vector<string> ciudades = g.get_vertices();
+    Visitas grados;                                     // ciudad -> cantidad de vecinos
+    for (size_t i = 0; i < ciudades.size(); i++) {
+        vector<string> vecinos = g.get_neighbors(ciudades[i]);
+        int cantidad = 0;
+        for (size_t j = 0; j < vecinos.size(); j++) {
+            cantidad++;                                 // sumo 1 por cada vecino
+    }
+    grados[ciudades[i]] = cantidad;
+} 
+
+cout << "10 más visitadas (random walk común):"<<endl;
+imprimirTop10(visitas, ciudades);
+cout << "10 más visitadas (random walk por distancia):"<<endl;;
+imprimirTop10(visitasPorDistancia, ciudades);
+cout << "10 de mayor grado:"<<endl;
+imprimirTop10(grados, ciudades);  
+
 
     cout << "\n=== Ejercicio 6 ===\n";
-    analisisLibre(g);
+    analisisLibre(g,dist);
 
     return 0;
 }
