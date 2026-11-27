@@ -106,40 +106,40 @@ Random walk por distancia:
 
 Resultado:
   10 más visitadas (random walk común):
-    Buenos Aires : 3867
-    La Plata : 3814
-    Quilmes : 3363
-    Tigre : 3348
-    Morón : 4104
-    Ezeiza : 4562
-    Mar del Plata : 3451
-    Bahía Blanca : 3987
-    Punta Alta : 3818
-    Tandil : 4238
+    Buenos Aires : 3705
+    La Plata : 3709
+    Buenos Aires : 3705
+    Buenos Aires : 3705
+    Morón : 3925
+    Ezeiza : 4376
+    Buenos Aires : 3705
+    Ezeiza : 4376
+    Morón : 3925
+    Ezeiza : 4376
 
   10 más visitadas (random walk por distancia):
-    Buenos Aires : 6958
-    La Plata : 3878
-    Quilmes : 6230
-    Tigre : 5770
-    Morón : 7209
-    Ezeiza : 6521
-    Mar del Plata : 2998
-    Bahía Blanca : 3735
-    Punta Alta : 3199
-    Tandil : 2901
+    Buenos Aires : 7156
+    Buenos Aires : 7156
+    Buenos Aires : 7156
+    Buenos Aires : 7156
+    Morón : 7226
+    Buenos Aires : 7156
+    Buenos Aires : 7156
+    Buenos Aires : 7156
+    Buenos Aires : 7156
+    Buenos Aires : 7156
 
   10 de mayor grado:
     Buenos Aires : 10
-    La Plata : 10
-    Quilmes : 9
-    Tigre : 9
+    Buenos Aires : 10
+    Buenos Aires : 10
+    Buenos Aires : 10
     Morón : 11
     Ezeiza : 12
-    Mar del Plata : 9
-    Bahía Blanca : 11
-    Punta Alta : 10
-    Tandil : 1
+    Buenos Aires : 10
+    Morón : 11
+    Buenos Aires : 10
+    Morón : 11
   
 Que observamos (comun vs. grado):
   La cantidad de visitas es casi proporcional al grado. Por

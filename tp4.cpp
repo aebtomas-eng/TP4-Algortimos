@@ -413,7 +413,7 @@ void imprimirTop10(Visitas& v, const vector<string>& ciudades) {
         for (size_t j=0; j<ciudades.size();j++){
             if (visitada[i]) continue;
             if (mejor == ciudades.size() || v[ciudades[i]]>v[ciudades[mejor]]){
-                mejor = i;
+                mejor = j;
             }
         }
         visitada[mejor] =true;
